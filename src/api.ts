@@ -1,6 +1,4 @@
-const API_BASE = normalizeApiBase(
-  process.env.NEXT_PUBLIC_GANGHUA_API_BASE_URL ?? 'http://127.0.0.1:8080',
-);
+const API_BASE = "/api/backend";
 
 type ApiResponse<T> = {
   code: number;
@@ -12,7 +10,16 @@ export async function request<T>(
   path: string,
   init: RequestInit = {},
 ): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, init);
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, init);
+  } catch (cause) {
+    if (cause instanceof DOMException && cause.name === "AbortError") {
+      throw cause;
+    }
+    throw new Error("无法连接服务端，请检查网络后重试");
+  }
+
   let body: ApiResponse<T>;
   try {
     body = (await response.json()) as ApiResponse<T>;
@@ -31,6 +38,10 @@ export function assetUrl(value?: string): string {
     return '';
   }
   if (source.startsWith('http://') || source.startsWith('https://')) {
+    const proxied = proxyKnownBackendAsset(source);
+    if (proxied) {
+      return proxied;
+    }
     return source;
   }
   if (!source.startsWith('/')) {
@@ -39,7 +50,19 @@ export function assetUrl(value?: string): string {
   return `${API_BASE}${source}`;
 }
 
-function normalizeApiBase(value: string): string {
-  const trimmed = value.trim();
-  return trimmed.endsWith('/') ? trimmed.slice(0, -1) : trimmed;
+function proxyKnownBackendAsset(source: string): string | null {
+  try {
+    const url = new URL(source);
+    if (url.hostname !== "api.gagagugu.cn") {
+      return null;
+    }
+
+    const apiPrefix = "/app/api";
+    const path = url.pathname.startsWith(`${apiPrefix}/`)
+      ? url.pathname.slice(apiPrefix.length)
+      : url.pathname;
+    return `${API_BASE}${path}${url.search}`;
+  } catch {
+    return null;
+  }
 }
