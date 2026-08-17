@@ -6,9 +6,10 @@ import { request } from "@/src/api";
 import type { DashboardStats } from "@/src/types";
 
 import { DashboardView } from "./DashboardView";
+import { ReportsView } from "./ReportsView";
 import { ReviewsView } from "./ReviewsView";
 
-type AppRoute = "dashboard" | "reviews";
+type AppRoute = "dashboard" | "reviews" | "reports";
 type ToastState = {
   message: string;
   tone: "success" | "error";
@@ -61,8 +62,13 @@ export function AdminApp() {
 
   useEffect(() => {
     const syncRoute = () => {
+      const hash = window.location.hash;
       setActiveRoute(
-        window.location.hash === "#reviews" ? "reviews" : "dashboard",
+        hash === "#reviews"
+          ? "reviews"
+          : hash === "#reports"
+            ? "reports"
+            : "dashboard",
       );
     };
     syncRoute();
@@ -110,7 +116,12 @@ export function AdminApp() {
     void refreshPendingCount();
   }, [refreshPendingCount]);
 
-  const title = activeRoute === "dashboard" ? "数据概览" : "音频审核";
+  const title =
+    activeRoute === "dashboard"
+      ? "数据概览"
+      : activeRoute === "reviews"
+        ? "音频审核"
+        : "用户投诉";
 
   return (
     <>
@@ -157,6 +168,14 @@ export function AdminApp() {
                 </span>
               ) : null}
             </a>
+            <a
+              href="#reports"
+              className={activeRoute === "reports" ? "is-active" : undefined}
+              aria-current={activeRoute === "reports" ? "page" : undefined}
+            >
+              <span className="nav-index">03</span>
+              <span>用户投诉</span>
+            </a>
           </nav>
 
           <div className="sidebar__footer">
@@ -199,11 +218,18 @@ export function AdminApp() {
                 onLoaded={handleDashboardLoaded}
                 onLoadingChange={setIsLoading}
               />
-            ) : (
+            ) : activeRoute === "reviews" ? (
               <ReviewsView
                 refreshToken={refreshToken}
                 onLoaded={handleReviewsLoaded}
                 onChanged={handleReviewChanged}
+                onLoadingChange={setIsLoading}
+                showToast={showToast}
+              />
+            ) : (
+              <ReportsView
+                refreshToken={refreshToken}
+                onLoaded={handleReviewsLoaded}
                 onLoadingChange={setIsLoading}
                 showToast={showToast}
               />

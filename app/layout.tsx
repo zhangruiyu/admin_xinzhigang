@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "钢化你的心运营后台",
-  description: "钢化你的心数据概览与音频审核后台",
+  description: "钢化你的心数据概览、音频审核与用户投诉后台",
 };
 
 export const viewport: Viewport = {

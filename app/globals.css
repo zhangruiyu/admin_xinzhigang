@@ -764,6 +764,44 @@ dd {
   font-weight: 800;
 }
 
+.status-pill--muted {
+  color: var(--ink-secondary);
+  background: var(--surface-strong);
+}
+
+.report-card__content {
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+.report-summary {
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid #ebcbd1;
+  border-radius: 7px;
+  background: #fff9fa;
+}
+
+.report-summary__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.report-summary time {
+  color: var(--ink-muted);
+  font-size: 10px;
+}
+
+.report-summary > p {
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
 .review-card__description {
   max-width: 760px;
   margin-top: 9px;
@@ -1295,6 +1333,10 @@ dd {
     grid-column: 2;
     justify-content: flex-end;
   }
+
+  .report-card .review-card__actions {
+    display: flex;
+  }
 }
 
 @media (max-width: 760px) {
@@ -1426,6 +1468,15 @@ dd {
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .report-card .review-card__actions {
+    display: flex;
+    justify-content: stretch;
+  }
+
+  .report-card .review-card__actions .button {
+    width: 100%;
   }
 
   .modal-backdrop {

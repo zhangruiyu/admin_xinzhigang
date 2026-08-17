@@ -39,6 +39,17 @@ export type ReviewRequest = {
   reviewedAt?: string;
 };
 
+export type AudioPackReport = {
+  id: number;
+  packId: number;
+  userId: number;
+  reason: string;
+  description?: string | null;
+  createdAt: string;
+  packDeleted: boolean;
+  pack: AudioPack;
+};
+
 export type PageData<T> = {
   data: T[];
   offset: number;
