@@ -62,6 +62,9 @@ export function ReviewConfigView({
 
   const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!config) {
+      return;
+    }
     const value = reviewVersion.trim();
     if (!value) {
       setError("请填写鸿蒙审核版本");
@@ -70,10 +73,10 @@ export function ReviewConfigView({
     setBusy(true);
     setError(null);
     try {
-      const result = await updateConfig(value);
+      const result = await updateConfig(value, config.enabled);
       setConfig(result);
       setReviewVersion(result.reviewVersion ?? "");
-      showToast(`已启用鸿蒙 ${result.reviewVersion} 审核模式`);
+      showToast(`鸿蒙审核版本已更新为 ${result.reviewVersion}`);
       onLoaded();
     } catch (cause) {
       setError(errorMessage(cause));
@@ -82,14 +85,25 @@ export function ReviewConfigView({
     }
   };
 
-  const disable = async () => {
+  const toggle = async (enabled: boolean) => {
+    if (!config) {
+      return;
+    }
+    const value = reviewVersion.trim();
+    if (enabled && !value) {
+      setError("启用审核模式前请填写鸿蒙审核版本");
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
-      const result = await updateConfig(null);
+      const result = await updateConfig(
+        value || config.reviewVersion || null,
+        enabled,
+      );
       setConfig(result);
-      setReviewVersion("");
-      showToast("已停用鸿蒙审核模式");
+      setReviewVersion(result.reviewVersion ?? "");
+      showToast(enabled ? "已启用鸿蒙审核模式" : "已停用鸿蒙审核模式");
       onLoaded();
     } catch (cause) {
       setError(errorMessage(cause));
@@ -150,6 +164,26 @@ export function ReviewConfigView({
           </p>
         </div>
 
+        <div className="review-config-toggle">
+          <div>
+            <strong>审核模式开关</strong>
+            <p>
+              关闭后立即恢复普通市场内容，已填写的审核版本会保留。
+            </p>
+          </div>
+          <button
+            className={`toggle-switch ${config.enabled ? "is-enabled" : ""}`}
+            type="button"
+            role="switch"
+            aria-checked={config.enabled}
+            aria-label={config.enabled ? "停用鸿蒙审核模式" : "启用鸿蒙审核模式"}
+            disabled={busy}
+            onClick={() => void toggle(!config.enabled)}
+          >
+            <span />
+          </button>
+        </div>
+
         <form className="review-config-form" onSubmit={save}>
           <label htmlFor="ohos-review-version">鸿蒙审核版本</label>
           <div className="review-config-form__row">
@@ -172,7 +206,7 @@ export function ReviewConfigView({
               type="submit"
               disabled={busy || reviewVersion.trim().length === 0}
             >
-              {busy ? "处理中…" : "保存并启用"}
+              {busy ? "处理中…" : "保存版本"}
             </button>
           </div>
           <p className="field-help">
@@ -181,29 +215,16 @@ export function ReviewConfigView({
           <p className="form-error" role="alert">
             {error}
           </p>
-          <div className="review-config-form__footer">
-            <p>
-              停用后，鸿蒙市场和搜索立即恢复普通内容策略。
-            </p>
-            <button
-              className="button button--danger"
-              type="button"
-              disabled={busy || !config.enabled}
-              onClick={() => void disable()}
-            >
-              停用审核模式
-            </button>
-          </div>
         </form>
       </section>
     </>
   );
 }
 
-function updateConfig(reviewVersion: string | null) {
+function updateConfig(reviewVersion: string | null, enabled: boolean) {
   return request<OhosReviewConfig>("/admin/review_config/ohos", {
     method: "PUT",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ reviewVersion }),
+    body: JSON.stringify({ reviewVersion, enabled }),
   });
 }

@@ -1296,6 +1296,74 @@ dd {
   letter-spacing: -0.025em;
 }
 
+.review-config-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.review-config-toggle > div {
+  display: grid;
+  gap: 5px;
+}
+
+.review-config-toggle strong {
+  font-size: 12px;
+}
+
+.review-config-toggle p {
+  color: var(--ink-muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: #d9d1d3;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.toggle-switch span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(39 27 31 / 22%);
+  transition: transform 160ms ease;
+}
+
+.toggle-switch.is-enabled {
+  border-color: var(--success);
+  background: var(--success);
+}
+
+.toggle-switch.is-enabled span {
+  transform: translateX(20px);
+}
+
+.toggle-switch:focus-visible {
+  outline: 3px solid var(--accent-soft);
+  outline-offset: 2px;
+}
+
+.toggle-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
 .review-config-form {
   display: grid;
   margin-top: 22px;
