@@ -25,7 +25,7 @@ type ReviewDialogProps = {
   onClose: () => void;
   onChooseApprove: (review: ReviewRequest) => void;
   onChooseReject: (review: ReviewRequest) => void;
-  onApprove: (id: number) => Promise<void>;
+  onApprove: (id: number, requiresCopyright: boolean) => Promise<void>;
   onReject: (id: number, reason: string) => Promise<void>;
 };
 
@@ -41,6 +41,9 @@ export function ReviewDialog({
   const [busy, setBusy] = useState(false);
   const [reason, setReason] = useState("");
   const [formError, setFormError] = useState("");
+  const [requiresCopyright, setRequiresCopyright] = useState<boolean | null>(
+    null,
+  );
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -64,10 +67,14 @@ export function ReviewDialog({
     if (state.kind !== "approve") {
       return;
     }
+    if (requiresCopyright === null) {
+      setFormError("请选择音频是否需要版权");
+      return;
+    }
     setBusy(true);
     setFormError("");
     try {
-      await onApprove(state.review.id);
+      await onApprove(state.review.id, requiresCopyright);
     } catch (cause) {
       setBusy(false);
       setFormError(errorMessage(cause));
@@ -170,6 +177,46 @@ export function ReviewDialog({
                 </p>
               </div>
             </div>
+            <fieldset className="copyright-choice">
+              <legend>该音频是否需要版权？</legend>
+              <div className="copyright-choice__options">
+                <label>
+                  <input
+                    type="radio"
+                    name="requiresCopyright"
+                    value="true"
+                    checked={requiresCopyright === true}
+                    disabled={busy}
+                    data-autofocus
+                    onChange={() => {
+                      setRequiresCopyright(true);
+                      setFormError("");
+                    }}
+                  />
+                  <span>
+                    <strong>需要版权</strong>
+                    <small>鸿蒙审核版本的市场与搜索中隐藏</small>
+                  </span>
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="requiresCopyright"
+                    value="false"
+                    checked={requiresCopyright === false}
+                    disabled={busy}
+                    onChange={() => {
+                      setRequiresCopyright(false);
+                      setFormError("");
+                    }}
+                  />
+                  <span>
+                    <strong>不需要版权</strong>
+                    <small>鸿蒙审核版本中可正常展示</small>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
             <p className="form-error" role="alert">
               {formError}
             </p>
@@ -183,9 +230,8 @@ export function ReviewDialog({
               </button>
               <button
                 className="button button--primary"
-                disabled={busy}
+                disabled={busy || requiresCopyright === null}
                 aria-busy={busy}
-                data-autofocus
                 onClick={() => void submitApprove()}
               >
                 {busy ? "处理中…" : "确认通过"}

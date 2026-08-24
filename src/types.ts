@@ -76,3 +76,10 @@ export type DashboardStats = {
     count: number;
   }>;
 };
+
+export type OhosReviewConfig = {
+  channel: "ohos";
+  reviewVersion?: string | null;
+  enabled: boolean;
+  updatedAt?: string | null;
+};

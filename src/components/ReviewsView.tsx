@@ -136,9 +136,11 @@ export function ReviewsView({
     onChanged();
   };
 
-  const approve = async (id: number) => {
+  const approve = async (id: number, requiresCopyright: boolean) => {
     await request<ReviewRequest>(`/admin/audio_review/${id}/approve`, {
       method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ requiresCopyright }),
     });
     completeAction("审核已通过，作品现在已公开");
   };

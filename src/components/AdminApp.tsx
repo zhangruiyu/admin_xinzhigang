@@ -7,9 +7,10 @@ import type { DashboardStats } from "@/src/types";
 
 import { DashboardView } from "./DashboardView";
 import { ReportsView } from "./ReportsView";
+import { ReviewConfigView } from "./ReviewConfigView";
 import { ReviewsView } from "./ReviewsView";
 
-type AppRoute = "dashboard" | "reviews" | "reports";
+type AppRoute = "dashboard" | "reviews" | "reports" | "review-config";
 type ToastState = {
   message: string;
   tone: "success" | "error";
@@ -68,7 +69,9 @@ export function AdminApp() {
           ? "reviews"
           : hash === "#reports"
             ? "reports"
-            : "dashboard",
+            : hash === "#review-config"
+              ? "review-config"
+              : "dashboard",
       );
     };
     syncRoute();
@@ -121,7 +124,9 @@ export function AdminApp() {
       ? "数据概览"
       : activeRoute === "reviews"
         ? "音频审核"
-        : "用户投诉";
+        : activeRoute === "reports"
+          ? "用户投诉"
+          : "审核版本配置";
 
   return (
     <>
@@ -176,6 +181,18 @@ export function AdminApp() {
               <span className="nav-index">03</span>
               <span>用户投诉</span>
             </a>
+            <a
+              href="#review-config"
+              className={
+                activeRoute === "review-config" ? "is-active" : undefined
+              }
+              aria-current={
+                activeRoute === "review-config" ? "page" : undefined
+              }
+            >
+              <span className="nav-index">04</span>
+              <span>审核配置</span>
+            </a>
           </nav>
 
           <div className="sidebar__footer">
@@ -226,8 +243,15 @@ export function AdminApp() {
                 onLoadingChange={setIsLoading}
                 showToast={showToast}
               />
-            ) : (
+            ) : activeRoute === "reports" ? (
               <ReportsView
+                refreshToken={refreshToken}
+                onLoaded={handleReviewsLoaded}
+                onLoadingChange={setIsLoading}
+                showToast={showToast}
+              />
+            ) : (
+              <ReviewConfigView
                 refreshToken={refreshToken}
                 onLoaded={handleReviewsLoaded}
                 onLoadingChange={setIsLoading}
