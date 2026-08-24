@@ -83,3 +83,13 @@ export type OhosReviewConfig = {
   enabled: boolean;
   updatedAt?: string | null;
 };
+
+export type RegistrationRewardConfig = {
+  enabled: boolean;
+  updatedAt?: string | null;
+  claimedCount: number;
+  successfulCount: number;
+  processingCount: number;
+  failedCount: number;
+  cancelledCount: number;
+};

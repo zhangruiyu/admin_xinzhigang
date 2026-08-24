@@ -7,10 +7,16 @@ import type { DashboardStats } from "@/src/types";
 
 import { DashboardView } from "./DashboardView";
 import { ReportsView } from "./ReportsView";
+import { RegistrationRewardView } from "./RegistrationRewardView";
 import { ReviewConfigView } from "./ReviewConfigView";
 import { ReviewsView } from "./ReviewsView";
 
-type AppRoute = "dashboard" | "reviews" | "reports" | "review-config";
+type AppRoute =
+  | "dashboard"
+  | "reviews"
+  | "reports"
+  | "review-config"
+  | "registration-reward";
 type ToastState = {
   message: string;
   tone: "success" | "error";
@@ -71,6 +77,8 @@ export function AdminApp() {
             ? "reports"
             : hash === "#review-config"
               ? "review-config"
+              : hash === "#registration-reward"
+                ? "registration-reward"
               : "dashboard",
       );
     };
@@ -126,7 +134,9 @@ export function AdminApp() {
         ? "音频审核"
         : activeRoute === "reports"
           ? "用户投诉"
-          : "审核版本配置";
+          : activeRoute === "review-config"
+            ? "审核版本配置"
+            : "注册奖励提现";
 
   return (
     <>
@@ -193,6 +203,20 @@ export function AdminApp() {
               <span className="nav-index">04</span>
               <span>审核配置</span>
             </a>
+            <a
+              href="#registration-reward"
+              className={
+                activeRoute === "registration-reward"
+                  ? "is-active"
+                  : undefined
+              }
+              aria-current={
+                activeRoute === "registration-reward" ? "page" : undefined
+              }
+            >
+              <span className="nav-index">05</span>
+              <span>注册奖励</span>
+            </a>
           </nav>
 
           <div className="sidebar__footer">
@@ -250,8 +274,15 @@ export function AdminApp() {
                 onLoadingChange={setIsLoading}
                 showToast={showToast}
               />
-            ) : (
+            ) : activeRoute === "review-config" ? (
               <ReviewConfigView
+                refreshToken={refreshToken}
+                onLoaded={handleReviewsLoaded}
+                onLoadingChange={setIsLoading}
+                showToast={showToast}
+              />
+            ) : (
+              <RegistrationRewardView
                 refreshToken={refreshToken}
                 onLoaded={handleReviewsLoaded}
                 onLoadingChange={setIsLoading}
